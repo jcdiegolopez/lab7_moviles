@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -30,20 +31,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import com.plataformas.lab7.database.categories.MealCategoryEntity
 import com.plataformas.lab7.model.Category
 import com.plataformas.lab7.viewmodel.CategoryViewModel
 
 
 @Composable
-fun CategoryScreen(navController: NavController) {
+fun CategoryScreen(navController: NavController,viewModel: CategoryViewModel) {
     // Obteniendo las categorías desde el ViewModel
-    val viewModel: CategoryViewModel = viewModel()
-    val categories = viewModel.categories.value
+    val categories = viewModel.categories.observeAsState(initial = emptyList())
+    val isLoading = viewModel.isLoading.observeAsState(initial = false)
+    val errorMessage by viewModel.errorMessage.observeAsState()
 
     // Mostrar la UI mientras las categorías se cargan o si hay un error
     when {
-        categories.isEmpty() -> {
-            println(categories)
+        isLoading.value -> {
+            println(categories.value)
             println("Cargando categorías...")
             AsyncImage(
                 model = "https://img.freepik.com/vector-gratis/coche-sedan-rojo-estilo-dibujos-animados-aislado-sobre-fondo-blanco_1308-64900.jpg",
@@ -63,7 +66,7 @@ fun CategoryScreen(navController: NavController) {
                         modifier = Modifier.padding(8.dp)
                     )
                 }
-                items(categories) { category ->
+                items(categories.value) { category ->
                     CategoryItem(category, navController)
                 }
             }
@@ -72,7 +75,7 @@ fun CategoryScreen(navController: NavController) {
 }
 
 @Composable
-fun CategoryItem(category: Category, navController: NavController) {
+fun CategoryItem(category: MealCategoryEntity, navController: NavController) {
     // Aquí puedes personalizar cómo mostrar las categorías
     Card(
         modifier = Modifier

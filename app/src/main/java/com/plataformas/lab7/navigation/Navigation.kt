@@ -11,15 +11,17 @@ import androidx.navigation.compose.composable
 import com.plataformas.lab7.ui.CategoryScreen
 import com.plataformas.lab7.ui.RecipeDetailScreen
 import com.plataformas.lab7.ui.RecipeScreen
+import com.plataformas.lab7.viewmodel.CategoryViewModel
+
 @Composable
-fun AppNavigation(navController: NavHostController, innerPadding : PaddingValues) {
+fun AppNavigation(navController: NavHostController,  mealViewModel: CategoryViewModel,innerPadding : PaddingValues) {
     NavHost(
         navController = navController,
         startDestination = "category_screen",
         modifier = Modifier.padding(innerPadding)
     ) {
         composable("category_screen") {
-            CategoryScreen(navController)
+            CategoryScreen(navController,viewModel = mealViewModel)
         }
         composable("recipe_screen/{categoryName}") { backStackEntry ->
             val categoryName = backStackEntry.arguments?.getString("categoryName")

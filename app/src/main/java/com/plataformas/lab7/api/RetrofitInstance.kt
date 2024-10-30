@@ -8,7 +8,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Retrofit
 
 
-class RetrofitInstance {
+interface IMealsWebService {
+    suspend fun getMealsCategories(): MealsCategoriesResponse
+    suspend fun getMealsByCategory(categoryName: String): RecipeResponse
+    suspend fun getRecipeDetail(recipeId: String): RecipeDetailResponse
+}
+
+class RetrofitInstance: IMealsWebService {
 
     private lateinit var api: ApiService
 
@@ -24,15 +30,15 @@ class RetrofitInstance {
     }
 
 
-    suspend fun getMealsCategories(): MealsCategoriesResponse {
+    override suspend fun getMealsCategories(): MealsCategoriesResponse {
         return api.getCategories()
     }
 
-    suspend fun getMealsByCategory(categoryName: String): RecipeResponse {
+    override suspend fun getMealsByCategory(categoryName: String): RecipeResponse {
         return api.getRecipesByCategory(categoryName)
     }
 
-    suspend fun getRecipeDetail(recipeId: String): RecipeDetailResponse {
+    override suspend fun getRecipeDetail(recipeId: String): RecipeDetailResponse {
         return api.getRecipeDetail(recipeId)
     }
 }

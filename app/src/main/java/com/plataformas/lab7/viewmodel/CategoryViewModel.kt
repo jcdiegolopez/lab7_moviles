@@ -3,41 +3,64 @@ package com.plataformas.lab7.viewmodel
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.plataformas.lab7.api.RetrofitInstance
+import com.plataformas.lab7.database.categories.MealCategoryEntity
 import com.plataformas.lab7.model.Category
 import com.plataformas.lab7.repository.CategoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okio.IOException
 
-class CategoryViewModel(private val repository: CategoryRepository = CategoryRepository()) : ViewModel() {
+class CategoryViewModel(private val repository: CategoryRepository): ViewModel() {
 
-    val categories : MutableState<List<Category>> = mutableStateOf(emptyList<Category>())
-    var errorMessage: MutableState<String> = mutableStateOf("")
+    private val _categories = MutableLiveData<List<MealCategoryEntity>>()
+    val categories: LiveData<List<MealCategoryEntity>> = _categories
 
-    init {
-        Log.d("TAG_COROUTINES", "about to launch a coroutine")
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
+
+    fun fetchCategories() {
+        _isLoading.value = true
+        _errorMessage.value = null
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Log.d("TAG_COROUTINES", "launching a coroutine")
-                val meals = getCategories()
-                Log.d("TAG_COROUTINES", "we have received sync data")
-                print(meals)
-                categories.value = meals
-            }catch (e: Exception) {
-                Log.e("TAG_COROUTINES", "Exception $e")
-                errorMessage.value = e.message ?: "Unknown error"
+                val meals = repository.getCategories()
+                _categories.postValue(meals)
+            } catch (e: Exception) {
+                handleException(e)
+            } finally {
+                _isLoading.postValue(false)
             }
-
         }
-        Log.d("TAG_COROUTINES", "other work")
     }
 
-    // Función para obtener las categorías de la API
-    private suspend fun getCategories() : List<Category> {
-        return repository.getCategories()
+    private fun handleException(exception: Exception) {
+        when (exception) {
+            is IOException -> _errorMessage.value = "Network error: Check your internet connection."
+            else -> _errorMessage.value = "An unexpected error occurred."
+        }
+        // Optionally log the exception (e.g., using a logger or crash reporting tool)
+        exception.printStackTrace()
+    }
+}
+
+class MealViewModelFactory(private val repository: CategoryRepository) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CategoryViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CategoryViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
