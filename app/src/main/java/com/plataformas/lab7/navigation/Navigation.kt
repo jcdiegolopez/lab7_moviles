@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -11,10 +12,12 @@ import androidx.navigation.compose.composable
 import com.plataformas.lab7.ui.CategoryScreen
 import com.plataformas.lab7.ui.RecipeDetailScreen
 import com.plataformas.lab7.ui.RecipeScreen
+import com.plataformas.lab7.ui.SupermarketScreen
 import com.plataformas.lab7.viewmodel.CategoryViewModel
+import com.plataformas.lab7.viewmodel.SupermarketViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController,  mealViewModel: CategoryViewModel,innerPadding : PaddingValues) {
+fun AppNavigation(navController: NavHostController,  mealViewModel: CategoryViewModel,supermarketViewModel: SupermarketViewModel, innerPadding : PaddingValues) {
     NavHost(
         navController = navController,
         startDestination = "category_screen",
@@ -30,6 +33,9 @@ fun AppNavigation(navController: NavHostController,  mealViewModel: CategoryView
         composable("recipe_detail_screen/{recipeId}") { backStackEntry ->
             val recipeId = backStackEntry.arguments?.getString("recipeId")
             RecipeDetailScreen(navController, recipeId)
+        }
+        composable("supermarketitems_screen") { backStackEntry ->
+            SupermarketScreen(navController, viewModel = supermarketViewModel)
         }
     }
 }

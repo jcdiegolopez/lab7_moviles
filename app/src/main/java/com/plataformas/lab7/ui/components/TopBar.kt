@@ -1,7 +1,9 @@
 package com.plataformas.lab7.ui.components
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,19 +21,36 @@ fun TopBar(
     title: String = "App Title",
     showBackButton: Boolean = false
 ) {
-    TopAppBar(
-        title = { Text(text = title) },
-        navigationIcon = {
-            if (showBackButton) {
-                run {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = null)
+        TopAppBar(
+            title = {
+                Row(
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
+                ){
+                    Text(text = title)
+                    IconButton(onClick = { navController.navigate("supermarketitems_screen") }) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = null
+                        )
                     }
                 }
-            } else {
-                null
+                    },
+
+            navigationIcon = {
+                if (showBackButton) {
+                    run {
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = null)
+                        }
+                    }
+                } else {
+                    null
+                }
+
             }
-        }
-    )
+        )
+
+
 }

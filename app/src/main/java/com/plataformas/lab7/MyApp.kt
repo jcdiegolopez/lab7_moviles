@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.plataformas.lab7.api.RetrofitInstance
 import com.plataformas.lab7.database.AppDatabase
 import com.plataformas.lab7.repository.CategoryRepository
+import com.plataformas.lab7.repository.SupermarketRepository
 
 class MyApp : Application() {
 
@@ -13,6 +14,9 @@ class MyApp : Application() {
         private set
 
     lateinit var categoryRepository: CategoryRepository
+        private set
+
+    lateinit var supermarketRepository: SupermarketRepository
         private set
 
     lateinit var categoryWebService: RetrofitInstance
@@ -25,11 +29,16 @@ class MyApp : Application() {
         database = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "meal-categories-db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
         categoryRepository = CategoryRepository(
             categoryWebService,
             database.mealCategoryDao()
         )
+
+        supermarketRepository = SupermarketRepository(
+            database.superMarketItemDao()
+        )
+
     }
 }

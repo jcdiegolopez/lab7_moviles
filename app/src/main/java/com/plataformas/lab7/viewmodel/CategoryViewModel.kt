@@ -46,10 +46,9 @@ class CategoryViewModel(private val repository: CategoryRepository): ViewModel()
 
     private fun handleException(exception: Exception) {
         when (exception) {
-            is IOException -> _errorMessage.value = "Network error: Check your internet connection."
-            else -> _errorMessage.value = "An unexpected error occurred."
+            is IOException -> _errorMessage.postValue("Network error: Check your internet connection.")
+            else -> _errorMessage.postValue("An unexpected error occurred.")
         }
-        // Optionally log the exception (e.g., using a logger or crash reporting tool)
         exception.printStackTrace()
     }
 }
